@@ -1,0 +1,13 @@
+# --- API server ---
+fastapi==0.115.5
+uvicorn[standard]==0.31.1
+pydantic==2.9.2
+python-dotenv==1.0.1
+gunicorn
+
+# --- ML runtime ---
+numpy==1.26.4
+tensorflow==2.16.1          # Keras3 포함(tf.keras 사용)
+scikit-learn==1.3.2         # MinMaxScaler 로드/transform용 (dump 버전에 맞추는 게 중요)
+joblib==1.5.2               # scaler joblib 로드용
+plotly==6.4.0               # 대시보드 시각화용
