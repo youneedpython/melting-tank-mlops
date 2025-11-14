@@ -6,15 +6,15 @@ from tensorflow import keras
 from fastapi import FastAPI, Header, Depends, HTTPException, status
 from fastapi import BackgroundTasks
 from typing import Annotated
-from app.dashboard import router as dashboard_router
+from .dashboard import router as dashboard_router
 
 # --- 프로젝트 모듈 임포트 ---
 # utils는 인증, 환경 변수 로드, 알림 등 보조 기능 담당
-from app import utils
+from .utils import authenticate_api_key, send_alert_notification, log_prediction_result
 # schemas는 데이터 유효성 검사 및 규격 정의 담당
-from app.schemas import PredictRequest, PredictResponse
+from .schemas import PredictRequest, PredictResponse
 # inference는 모델 추론 로직 담당
-from app.inference import predict_prob, post_process, VERSION
+from .inference import predict_prob, post_process, VERSION
 
 #########################################
 # 로그 생성
@@ -33,7 +33,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ## =================================================================
 # .env 파일 또는 AWS 환경 변수에서 값 로드
 # .env 파일을 읽어 시스템 환경 변수로 로드
-API_KEY = os.getenv("API_KEY", "happy")
+API_KEY = os.getenv("API_KEY")
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
 THRESHOLD = float(os.getenv("PREDICTION_THRESHOLD", 0.5)) # 임계값 로드
 
@@ -61,7 +61,7 @@ except Exception as e:
 ## =================================================================
 def get_api_key(x_api_key: Annotated[str | None, Header(alias="x-api-key")] = None):
     """API Key를 추출하고 인증 로직을 utils.py에 위임"""
-    if not utils.authenticate_api_key(x_api_key, API_KEY):
+    if not authenticate_api_key(x_api_key, API_KEY):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail="Unauthorized: Invalid API Key"
@@ -110,10 +110,10 @@ def predict(req: PredictRequest, background: BackgroundTasks):
     # 3. MLOps 알림 로직 (utils.py 사용)
     if label == "NG":
         message = f"🚨 불량 감지 경고! 예측 확률: {prob_ng:.2f} (임계값: {th})"
-        background.add_task(utils.send_alert_notification, message, SLACK_WEBHOOK_URL)
+        background.add_task(send_alert_notification, message, SLACK_WEBHOOK_URL)
         
     # 4. 결과 로깅 (운영 환경에서는 비동기적으로 처리)
-    # utils.log_prediction_result(req.readings, prob_ng, label, VERSION) # 비동기 로깅 구현 시 사용
+    # log_prediction_result(req.readings, prob_ng, label, VERSION) # 비동기 로깅 구현 시 사용
 
     return PredictResponse(prob_ng=prob_ng, label=label, threshold=th, version=VERSION)
 
