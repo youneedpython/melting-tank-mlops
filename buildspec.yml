@@ -1,0 +1,110 @@
+version: 0.1
+
+# 1. 환경 변수 정의
+# CodeBuild 프로젝트에서 공통으로 사용할 값을 고정해 둡니다.
+env:
+  variables:
+    # ECR 리포지토리 URI (이미지를 푸시할 주소)
+    REPOSITORY_URI: "393099937963.dkr.ecr.ap-northeast-2.amazonaws.com/mlops/melting-tank"
+
+    # ECS Task Definition 이름(Family)
+    TASK_DEFINITION_FAMILY: "melting-tank-api-td"
+
+    # Task Definition 안에서 사용할 컨테이너 이름
+    CONTAINER_NAME: "melting-tank-container"
+
+    # ECS 클러스터 이름
+    CLUSTER_NAME: "melting-tank-production-cluster"
+
+    # ECS 서비스 이름
+    SERVICE_NAME: "melting-tank-api-td-service"
+
+phases:
+  # 2. 빌드 사전 준비 단계 (Pre-build)
+  # - AWS CLI / Docker 사용 가능 여부 체크
+  # - ECR 로그인
+  # - 날짜 기반 IMAGE_TAG 생성
+  pre_build:
+    commands:
+      - echo "===== [Pre-build] Start ====="
+      - aws --version
+      - docker --version
+
+      # CodeBuild에서 사용할 리전 (필요하면 이 값만 수정)
+      - export AWS_REGION="ap-northeast-2"
+
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+
+      # Git 커밋 해시(앞 7자리) 가져오기 (없으면 latest 사용)
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7 || echo "latest")
+
+      # 날짜 기반 태그 (예: 20251115-153045-1a2b3c4)
+      - IMAGE_TAG="$(date +%Y%m%d-%H%M%S)-${COMMIT_HASH}"
+      - echo "Using IMAGE_TAG=${IMAGE_TAG}"
+
+      - echo "===== [Pre-build] Done ====="
+
+  # 3. 빌드 단계 (Build)
+  # - Docker 이미지 빌드
+  # - 방금 만든 태그와 latest 태그를 둘 다 붙임
+  build:
+    commands:
+      - echo "===== [Build] Start ====="
+      - echo "Building Docker image..."
+
+      # 현재 디렉토리의 Dockerfile 기준으로 이미지 빌드
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+
+      # same image -> latest 태그도 함께 사용
+      - docker tag $REPOSITORY_URI:$IMAGE_TAG $REPOSITORY_URI:latest
+
+      - echo "===== [Build] Done ====="
+
+  # 4. 빌드 후 단계 (Post-build)
+  # - ECR에 이미지 푸시
+  # - taskdef-template.json을 사용해 taskdef.json 생성
+  # - ECS Task Definition 등록 및 서비스 업데이트
+  post_build:
+    commands:
+      - echo "===== [Post-build] Start ====="
+
+      - echo "Pushing Docker image to ECR..."
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push $REPOSITORY_URI:latest
+
+      - echo "Rendering ECS task definition (taskdef.json)..."
+      # taskdef-template.json 안의 플레이스홀더를 실제 값으로 치환
+      #   {{TASK_DEFINITION_FAMILY}}
+      #   {{CONTAINER_NAME}}
+      #   {{IMAGE_URI}}
+      # 가 들어 있다고 가정합니다.
+      - |
+        sed -e "s|{{TASK_DEFINITION_FAMILY}}|$TASK_DEFINITION_FAMILY|g" \
+            -e "s|{{CONTAINER_NAME}}|$CONTAINER_NAME|g" \
+            -e "s|{{IMAGE_URI}}|$REPOSITORY_URI:$IMAGE_TAG|g" \
+            taskdef-template.json > taskdef.json
+
+      - echo "Registering new task definition in ECS..."
+      - |
+        NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+          --cli-input-json file://taskdef.json \
+          --query 'taskDefinition.taskDefinitionArn' \
+          --output text)
+
+      - echo "New Task Definition ARN: $NEW_TASK_DEF_ARN"
+
+      - echo "Updating ECS service to use new task revision..."
+      - |
+        aws ecs update-service \
+          --cluster $CLUSTER_NAME \
+          --service $SERVICE_NAME \
+          --task-definition $NEW_TASK_DEF_ARN
+
+      - echo "===== [Post-build] Done ====="
+
+# 5. 결과 아티팩트
+# CodePipeline 등에서 참고할 수 있도록 taskdef.json을 결과물로 남깁니다.
+artifacts:
+  files:
+    - taskdef.json
