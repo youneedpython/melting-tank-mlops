@@ -1,4 +1,4 @@
-version: 0.1
+version: 0.2
 
 # 1. 환경 변수 정의
 # CodeBuild 프로젝트에서 공통으로 사용할 값을 고정해 둡니다.
@@ -103,7 +103,13 @@ phases:
 
       - echo "===== [Post-build] Done ====="
 
-# 5. 결과 아티팩트
+# 5. 캐시 설정
+cache:
+  paths:
+    # pip 캐시 디렉토리를 캐싱하여 의존성 재설치를 방지합니다.
+    - '/root/.cache/pip'
+
+# 6. 결과 아티팩트
 # CodePipeline 등에서 참고할 수 있도록 taskdef.json을 결과물로 남깁니다.
 artifacts:
   files:
