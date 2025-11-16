@@ -30,6 +30,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN useradd --create-home appuser
 USER appuser
 
+
 # 6. 모델 아티팩트 및 코드 복사 (appuser의 홈 디렉토리로 복사)
 # 코드 복사
 COPY  ./app /app/app
