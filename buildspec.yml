@@ -90,7 +90,7 @@ phases:
         --cli-input-json file://taskdef.json \
         --query 'taskDefinition.taskDefinitionArn' \
         --output text)
-      - echo "New Task Definition ARN: $NEW_TASK_DEF_ARN"
+      - echo "New Task Definition ARN ==> $NEW_TASK_DEF_ARN"
       - echo "Updating ECS service to use new task revision..."
       - |
         aws ecs update-service \
