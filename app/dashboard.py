@@ -25,4 +25,5 @@ async def show_dashboard():
     ## Plotly HTML 생성은 동기적 I/O 작업이므로 run_in_threadpool을 사용해 블로킹 방지
     html = await run_in_threadpool(fig.to_html, full_html=False)
     
+
     return HTMLResponse(f"<h2>Melting Tank Dashboard</h2>{html}")
