@@ -1,0 +1,33 @@
+{
+  "family": "{{TASK_DEFINITION_FAMILY}}",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "2048",
+  "memory": "4096",
+  "executionRoleArn": "arn:aws:iam::393099937963:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::393099937963:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "{{CONTAINER_NAME}}",
+      "image": "{{IMAGE_URI}}",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/melting-tank-api",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
