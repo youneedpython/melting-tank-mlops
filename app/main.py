@@ -67,6 +67,7 @@ def get_api_key(x_api_key: Annotated[str | None, Header(alias="x-api-key")] = No
             detail="Unauthorized: Invalid API Key"
         )
 
+## FastAPI 인스턴스 생성
 # API 인증을 전역 의존성으로 설정하여 모든 엔드포인트에 적용 (선택 사항)
 app = FastAPI(
     title="Melting Tank Quality API",

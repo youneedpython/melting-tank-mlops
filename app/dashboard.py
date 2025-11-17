@@ -3,6 +3,8 @@ from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
+from fastapi.concurrency import run_in_threadpool
+
 
 router = APIRouter()
 
@@ -19,5 +21,8 @@ async def show_dashboard():
     fig.update_xaxes(title="Time")
     fig.update_layout(title="실시간 불량 확률 추이", height=500, margin=dict(l=40, r=20, t=60, b=40))
 
-    html = fig.to_html(full_html=False)
+    # html = fig.to_html(full_html=False)
+    ## Plotly HTML 생성은 동기적 I/O 작업이므로 run_in_threadpool을 사용해 블로킹 방지
+    html = await run_in_threadpool(fig.to_html, full_html=False)
+    
     return HTMLResponse(f"<h2>Melting Tank Dashboard</h2>{html}")
