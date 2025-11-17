@@ -56,9 +56,6 @@ phases:
       # 현재 디렉토리의 Dockerfile 기준으로 이미지 빌드
       - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
 
-      # same image -> latest 태그도 함께 사용
-      - docker tag $REPOSITORY_URI:$IMAGE_TAG $REPOSITORY_URI:latest
-
       - echo "===== [Build] Done ====="
 
   # 4. 빌드 후 단계 (Post-build)
@@ -70,7 +67,6 @@ phases:
       - echo "===== [Post-build] Start ====="
       - echo "Pushing Docker image to ECR..."
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - docker push $REPOSITORY_URI:latest
 
       - echo "Rendering ECS task definition (taskdef.json)..."
       # taskdef-template.json 안의 플레이스홀더를 실제 값으로 치환
