@@ -9,16 +9,16 @@
 # (Git LFS 미사용 시 필수)
 # ----------------------------------------
 # 훈련된 모델 파일 (가장 큰 용량을 차지)
-model/best_model.keras
-*.h5
-*.hdf5
+# model/best_model.keras
+# *.h5
+# *.hdf5
 # SavedModel 디렉토리 포맷 (디렉토리 전체 무시)
-exported_models/
+# exported_models/
 
 # 스케일러 등 전처리 객체
-artifacts/minmax_scaler.joblib
-*.pkl
-*.joblib
+# artifacts/minmax_scaler.joblib
+# *.pkl
+# *.joblib
 
 # 원본 데이터 파일 (대용량 파일)
 data/melting_tank.csv
