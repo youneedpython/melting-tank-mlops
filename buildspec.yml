@@ -68,17 +68,14 @@ phases:
       - echo "Pushing Docker image to ECR..."
       - docker push $REPOSITORY_URI:$IMAGE_TAG
 
-      - echo "Rendering ECS task definition (taskdef.json)..."
-      # taskdef-template.json 안의 플레이스홀더를 실제 값으로 치환
-      #   {{TASK_DEFINITION_FAMILY}}
-      #   {{CONTAINER_NAME}}
-      #   {{IMAGE_URI}}
-      # 가 들어 있다고 가정합니다.
-      - |
-        sed -e "s|{{TASK_DEFINITION_FAMILY}}|$TASK_DEFINITION_FAMILY|g" \
-        -e "s|{{CONTAINER_NAME}}|$CONTAINER_NAME|g" \
-        -e "s|{{IMAGE_URI}}|$REPOSITORY_URI:$IMAGE_TAG|g" \
-        taskdef-template.json > taskdef.json
+      - echo "Generating Image Definition JSON (taskdef.json)..."
+      
+      # 필수 JSON 구조 생성 및 taskdef.json 파일로 저장
+      # $CONTAINER_NAME 와 $REPOSITORY_URI 를 사용하여 JSON 구조 생성
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > taskdef.json
+
+      - echo "taskdef.json content:"
+      - cat taskdef.json # 파일 내용을 로그에 출력하여 확인
 
       - echo "===== [Post-build] Done ====="
 
