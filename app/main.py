@@ -10,11 +10,13 @@ from .dashboard import router as dashboard_router
 
 # --- 프로젝트 모듈 임포트 ---
 # utils는 인증, 환경 변수 로드, 알림 등 보조 기능 담당
-from .utils import authenticate_api_key, send_alert_notification, log_prediction_result
+from .utils import authenticate_api_key, send_alert_notification
 # schemas는 데이터 유효성 검사 및 규격 정의 담당
 from .schemas import PredictRequest, PredictResponse
 # inference는 모델 추론 로직 담당
 from .inference import predict_prob, post_process, VERSION
+from .storage import add_prediction_result
+
 
 #########################################
 # 로그 생성
@@ -33,9 +35,11 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ## =================================================================
 # .env 파일 또는 AWS 환경 변수에서 값 로드
 # .env 파일을 읽어 시스템 환경 변수로 로드
+load_dotenv()
 API_KEY = os.getenv("API_KEY")
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
-THRESHOLD = float(os.getenv("PREDICTION_THRESHOLD", 0.5)) # 임계값 로드
+# THRESHOLD = float(os.getenv("PREDICTION_THRESHOLD", 0.5)) # 임계값 로드
+THRESHOLD = float(os.getenv("PREDICTION_THRESHOLD")) # 임계값 로드
 
 ## =================================================================
 ## 2. 모델 및 스케일러 전역 로드 (서버 시작 시 단 1회)
@@ -108,7 +112,11 @@ def predict(req: PredictRequest, background: BackgroundTasks):
     # 2. 예측 후처리 및 라벨 결정
     label, th = post_process(prob_ng, THRESHOLD)
 
-    # 3. MLOps 알림 로직 (utils.py 사용)
+    # 3. MLOps 데이터 로깅 (추가)
+    # 전역 리스트에 예측 결과 저장
+    add_prediction_result(prob_ng) 
+
+    # 4. MLOps 알림 로직 (utils.py 사용)
     if label == "NG":
         message = f"🚨 불량 감지 경고! 예측 확률: {prob_ng:.2f} (임계값: {th})"
         background.add_task(send_alert_notification, message, SLACK_WEBHOOK_URL)

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Optional
+from typing import List
 
 
 ## --- 1. LSTM 시퀀스 길이 정의 ---

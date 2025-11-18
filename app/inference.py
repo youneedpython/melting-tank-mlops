@@ -1,9 +1,7 @@
-import numpy as np
 import pandas as pd
 from typing import List, Dict, Tuple
 from tensorflow import keras
 from sklearn.preprocessing import MinMaxScaler
-import os
 
 # --- 프로젝트 모듈 임포트 ---
 # utils에서 LSTM 시퀀스 변환 로직, 상수 등을 가져옴

@@ -2,9 +2,8 @@ import numpy as np
 import pandas as pd
 import time, os, json, requests
 import boto3
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional
 from sklearn.preprocessing import MinMaxScaler
-from app.schemas import LSTM_SEQUENCE_LENGTH
 from pandas.errors import EmptyDataError
 
 
