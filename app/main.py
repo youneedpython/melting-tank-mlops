@@ -38,8 +38,8 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
-# THRESHOLD = float(os.getenv("PREDICTION_THRESHOLD", 0.5)) # 임계값 로드
-THRESHOLD = float(os.getenv("PREDICTION_THRESHOLD")) # 임계값 로드
+THRESHOLD = float(os.getenv("PREDICTION_THRESHOLD", 0.5)) # 임계값 로드
+# THRESHOLD = float(os.getenv("PREDICTION_THRESHOLD")) # 임계값 로드
 
 ## =================================================================
 ## 2. 모델 및 스케일러 전역 로드 (서버 시작 시 단 1회)
