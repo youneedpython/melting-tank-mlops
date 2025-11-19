@@ -42,6 +42,17 @@ COPY  ./model /app/model
 # 7. 포트 노출 (FastAPI 기본 포트)
 EXPOSE 8000
 
+# 추가된 부분 ###################################
+# 데이터 파일 복사
+COPY data ./data
+
+# MES 시뮬레이터 스크립트 추가 >> 새로 추가
+COPY mes_simulator.py ./mes_simulator.py
+
+# 파이썬 출력 버퍼링 비활성화 (로그 실시간 출력용)
+ENV PYTHONUNBUFFERED=1
+###############################################
+
 # 8. 컨테이너 실행 명령어 (Gunicorn + Uvicorn Worker 사용 권장)
 # MLOps 표준: Uvicorn 단독 대신 Gunicorn을 마스터 프로세스로 사용하여 안정성과 성능 최적화
 # $PORT는 ECS/EKS 환경에서 동적으로 주입됩니다.
