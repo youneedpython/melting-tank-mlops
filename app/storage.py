@@ -27,7 +27,7 @@ def add_prediction_result(prob_ng: float) -> None:
     KST = pytz.timezone('Asia/Seoul')
 
     record = {
-        "timestamp": datetime.now(),  # 서버 현재 시각
+        "timestamp": datetime.now(KST),  # 서버 현재 시각
         "prob_ng": float(prob_ng),
     }
     PREDICTION_HISTORY.append(record)
