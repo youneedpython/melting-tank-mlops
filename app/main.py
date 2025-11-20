@@ -18,7 +18,6 @@ from .inference import predict_prob, post_process, VERSION
 from .storage import add_prediction_result
 
 
-#########################################
 # 로그 생성
 logger = logging.getLogger()
 
@@ -27,7 +26,6 @@ logger.setLevel(logging.INFO)
 
 # log 출력 형식
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#########################################
 
 
 ## =================================================================
