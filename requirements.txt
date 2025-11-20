@@ -4,6 +4,7 @@ uvicorn[standard]==0.31.1
 pydantic==2.9.2
 python-dotenv==1.0.1
 gunicorn
+pytz
 
 # --- AWS ---
 boto3==1.40.71

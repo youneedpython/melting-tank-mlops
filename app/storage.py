@@ -3,6 +3,7 @@
 import logging
 from datetime import datetime
 from typing import List, Dict, Any
+import pytz
 
 # 예측 결과를 저장할 최대 길이
 MAX_HISTORY: int = 30
@@ -21,6 +22,10 @@ def add_prediction_result(prob_ng: float) -> None:
     Args:
         prob_ng: 모델이 반환한 불량 확률 (0.0 ~ 1.0)
     """
+
+    # KST 시간대 객체 생성
+    KST = pytz.timezone('Asia/Seoul')
+
     record = {
         "timestamp": datetime.now(),  # 서버 현재 시각
         "prob_ng": float(prob_ng),
