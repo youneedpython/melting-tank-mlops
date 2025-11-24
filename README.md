@@ -1,5 +1,5 @@
 # 🧊 Melting-Tank MLOps
-## 실시간 제조 공정 불량 예측 시스템 (Real-time Manufacturing Defect Prediction System)
+## 실시간 제조 공정 불량 예측 시스템 <br/> (Real-time Manufacturing Defect Prediction System)
 
 ### 📌 프로젝트 개요
 **melting-tank-mlops**는 실제 제조 공정 데이터를 기반으로 *실시간 불량 발생 확률을 예측하고 시각화*하는 엔드-투-엔드(E2E) MLOps 시스템입니다.  
@@ -11,7 +11,7 @@ AI 모델 예측, 실시간 시뮬레이터, 대시보드, AWS 클라우드 배�
 
 ### 🔹 1. MES 실시간 데이터 시뮬레이터
 - CSV 기반 공정 데이터 스트리밍
-- 30초 간격 예측 호출 자동화
+- 30초 간격 예측 API 호출 자동화
 
 ### 🔹 2. AI 기반 불량 예측 모델
 - LSTM 모델 기반 예측
