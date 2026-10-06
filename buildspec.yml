@@ -4,8 +4,8 @@ version: 0.2
 # CodeBuild 프로젝트에서 공통으로 사용할 값을 고정해 둡니다.
 env:
   variables:
-    # ECR 리포지토리 URI (이미지를 푸시할 주소)
-    REPOSITORY_URI: "393099937963.dkr.ecr.ap-northeast-2.amazonaws.com/mlops/melting-tank"
+    # ECR 리포지토리 이름 (계정 번호와 리전은 pre_build에서 붙입니다)
+    ECR_REPOSITORY_NAME: "mlops/melting-tank"
 
     # ECS Task Definition 이름(Family)
     TASK_DEFINITION_FAMILY: "melting-tank-api-td"
@@ -32,6 +32,10 @@ phases:
 
       # CodeBuild에서 사용할 리전 (필요하면 이 값만 수정)
       - export AWS_REGION="ap-northeast-2"
+
+      # 계정 번호는 저장소에 적지 않고, Build를 실행하는 계정에서 조회합니다
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - REPOSITORY_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"
 
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
