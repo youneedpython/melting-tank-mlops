@@ -53,7 +53,10 @@ def predict_prob(
     # 4. 모델 예측 (Prediction)
     # 성능 최적화: 모델이 메모리에 상주하므로 로드 과정 없이 바로 predict 호출
     prediction = model.predict(X_inference, verbose=0)
-    prob_ng = prediction[0][0] # 불량 확률 추출
+    # 학습 시 Label은 OK=1, NG=0 (LabelEncoder의 알파벳 순서)이므로
+    # 모델 출력은 '정상(OK)일 확률'이다. 불량 확률은 1에서 뺀 값.
+    prob_ok = float(prediction[0][0])
+    prob_ng = 1.0 - prob_ok
 
     # NumPy float32를 Python float으로 변환하여 API 직렬화 문제 방지
     return float(prob_ng)
