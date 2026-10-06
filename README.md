@@ -25,7 +25,7 @@ MES 장비를 흉내 낸 Simulator가 주기적으로 데이터를 보내고, Da
 
 Local 환경에서 2026-10-06에 녹화했습니다. 빨리 보이도록 Simulator 전송 간격을 1초, Dashboard 갱신 간격을 2초로 줄였습니다(기본값은 둘 다 30초).
 
-**PC (54초)** — 기록이 없는 Dashboard → Simulator 시작 → 예측이 쌓이며 그래프와 KPI 카드 갱신 → 그래프에서 값 확인
+**PC (41초)** — Simulator가 보낸 예측이 쌓이기 시작한 Dashboard → 그래프와 KPI 카드 갱신 → NG 3건 연속 경고 → 그래프에서 값 확인
 
 https://github.com/user-attachments/assets/c9c8da01-f56a-4bc6-a82d-096048fb9ec1
 
